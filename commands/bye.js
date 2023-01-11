@@ -17,8 +17,12 @@ module.exports = {
 		if (!memberVC.speakable) {
 			console.log('VCで音声を再生する権限がありません。');
 		}
-		const connection = getVoiceConnection(memberVC.guild.id);
-		connection.destroy();
+		const connections = [ getVoiceConnection(memberVC.guild.id, 'listener'), getVoiceConnection(memberVC.guild.id, 'speaker') ];
+		for (const connection of connections) {
+			if (connection != undefined) {
+				connection.destroy();
+			}
+		}
 		await interaction.reply('Bye VC');
 		return;
 	},
