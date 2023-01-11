@@ -19,6 +19,7 @@ module.exports = {
 			console.log('VCで音声を再生する権限がありません。');
 		}
 		const connection = joinVoiceChannel({
+			group: 'listener',
 			guildId: LISTENER.GUILD_ID,
 			channelId: LISTENER.VC_ID,
 			adapterCreator: guild.voiceAdapterCreator,

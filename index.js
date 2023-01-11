@@ -26,7 +26,6 @@ for (let i = 0; i < clients.length; i++) {
 
 	clients[i].on(Events.InteractionCreate, async interaction => {
 		if (!interaction.isChatInputCommand()) return;
-		console.log(interaction);
 		const command = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) {

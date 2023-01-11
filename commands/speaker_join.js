@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const { LISTENER } = require('../config.json');
+const { SPEAKER } = require('../config.json');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('sjoin')
@@ -19,11 +19,12 @@ module.exports = {
 			console.log('VCで音声を再生する権限がありません。');
 		}
 		const connection = joinVoiceChannel({
-			guildId: LISTENER.GUILD_ID,
-			channelId: LISTENER.VC_ID,
+			group: 'speaker',
+			guildId: SPEAKER.GUILD_ID,
+			channelId: SPEAKER.VC_ID,
 			adapterCreator: guild.voiceAdapterCreator,
-			selfMute: true,
-			selfDeaf: false,
+			selfMute: false,
+			selfDeaf: true,
 		});
 		await interaction.reply('Join VC');
 		return;
