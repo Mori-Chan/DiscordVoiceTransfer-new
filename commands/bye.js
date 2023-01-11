@@ -23,7 +23,12 @@ module.exports = {
 				connection.destroy();
 			}
 		}
-		await interaction.reply('Bye VC');
+		if (connections[0] === undefined && connections[1] === undefined) {
+			await interaction.reply('VCに接続していません。');
+		}
+		else {
+			await interaction.reply('Bye VC');
+		}
 		return;
 	},
 };
