@@ -6,8 +6,8 @@ const fs = require('node:fs');
 const ListenerCommand = [];
 const SpeakerCommand = [];
 // Grab all the command files from the commands directory you created earlier
-const ListenerCommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && (file.startsWith('listener') || file.startsWith('bye')));
-const SpeakerCommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && (file.startsWith('speaker') || file.startsWith('bye')));
+const ListenerCommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && (file.startsWith('listener') || file.startsWith('bye') || file.startsWith('stream')));
+const SpeakerCommandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js') && (file.startsWith('speaker') || file.startsWith('bye') || file.startsWith('stream')));
 
 // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
 for (const LiFile of ListenerCommandFiles) {

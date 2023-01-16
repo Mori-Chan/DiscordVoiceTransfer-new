@@ -3,11 +3,11 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { LISTENER, SPEAKER } = require('./config.json');
 
-const clients = [ new Client({ intents: [GatewayIntentBits.Guilds] }), new Client({ intents: [GatewayIntentBits.Guilds] }) ];
+const clients = [ new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] }), new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] }) ];
 
 const commandsPath = path.join(__dirname, 'commands');
-const CommandFiles = [fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && (file.startsWith('listener') || file.startsWith('bye'))), fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && (file.startsWith('speaker') || file.startsWith('bye')))];
-
+const CommandFiles = [fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && (file.startsWith('listener') || file.startsWith('bye') || file.startsWith('stream'))), fs.readdirSync(commandsPath).filter(file => file.endsWith('.js') && (file.startsWith('speaker') || file.startsWith('bye') || file.startsWith('stream')))];
+let connections = [];
 
 for (let i = 0; i < clients.length; i++) {
 	clients[i].commands = new Collection();
@@ -34,7 +34,17 @@ for (let i = 0; i < clients.length; i++) {
 		}
 
 		try {
-			await command.execute(interaction);
+			if (interaction.commandName === 'stream') {
+				await command.execute(interaction, connections);
+			}
+			else if (interaction.commandName === 'bye') {
+				await command.execute(interaction, connections);
+				connections = [];
+			}
+			else {
+				connections[i] = await command.execute(interaction);
+				// console.log(connections[i].joinConfig.group);
+			}
 		}
 		catch (error) {
 			console.error(error);
