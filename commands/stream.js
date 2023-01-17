@@ -1,5 +1,9 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { createAudioPlayer, NoSubscriberBehavior, EndBehaviorType, createAudioResource, StreamType } = require('@discordjs/voice');
+const AudioMixer = require('audio-mixer');
+const Prism = require('prism-media');
+const { PassThrough } = require('stream');
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,23 +24,32 @@ module.exports = {
 					else if (connections[1].joinConfig.group === 'listener') {
 						connection1 = connections[1];
 					}
+					const mixer = new AudioMixer.Mixer({
+						channels: 2,
+						bitDepth: 16,
+						sampleRate: 48000,
+						clearInterval: 250,
+					});
 					connection1.receiver.speaking.on('start', (userId) => {
-						// const user = interaction.guild.members.fetch(userId);
+						const standaloneInput = new AudioMixer.Input({
+							channels: 2,
+							bitDepth: 16,
+							sampleRate: 48000,
+							volume: 100,
+						});
+						const audioMixer = mixer;
+						audioMixer.addInput(standaloneInput);
 						const audio = connection1.receiver.subscribe(userId, {
 							end: {
-								behavior: EndBehaviorType.AfterSilence,
-								duration: 10000,
+								behavior: EndBehaviorType.AfterInactivity,
+								duration: 100,
 							},
 						});
-						// const oggStream = new opus.OggLogicalBitstream({
-						// 	opusHead: new opus.OpusHead({ //←ここでエラー発生のため一旦削除
-						// 		channelCount: 2,
-						// 		sampleRate: 48000,
-						// 	}),
-						// 	pageSizeControl: {
-						// 		maxPackets: 10,
-						// 	},
-						// });
+						const rawStream = new PassThrough();
+						audio
+							.pipe(new Prism.opus.Decoder({ rate: 48000, channels: 2, frameSize: 960 }))
+							.pipe(rawStream);
+						const p = rawStream.pipe(standaloneInput);
 						let connection2;
 						if (connections[0].joinConfig.group === 'speaker' || connections[1].joinConfig.group === 'speaker') {
 							if (connections[0].joinConfig.group === 'speaker') {
@@ -50,13 +63,21 @@ module.exports = {
 									noSubscriber: NoSubscriberBehavior.play,
 								},
 							});
-							const resource = createAudioResource(audio,
+							const resource = createAudioResource(mixer,
 								{
-									inputType: StreamType.Opus,
+									inputType: StreamType.Raw,
 								},
 							);
 							player.play(resource);
 							connection2.subscribe(player);
+							rawStream.on('end', () => {
+								if (this.audioMixer != null) {
+									this.audioMixer.removeInput(standaloneInput);
+									standaloneInput.destroy();
+									rawStream.destroy();
+									p.destroy();
+								}
+							});
 						}
 					});
 				}
