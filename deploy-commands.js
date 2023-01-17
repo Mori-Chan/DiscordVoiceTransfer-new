@@ -33,12 +33,10 @@ const Speaker_rest = new REST({ version: '10' }).setToken(SPEAKER.TOKEN);
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const Listener_data = await Listener_rest.put(
 			Routes.applicationGuildCommands(LISTENER.CLIENT_ID, LISTENER.GUILD_ID),
-			// Routes.applicationCommands(CLIENT_ID),
 			{ body: ListenerCommand },
 		);
 		const Speaker_data = await Speaker_rest.put(
 			Routes.applicationGuildCommands(SPEAKER.CLIENT_ID, SPEAKER.GUILD_ID),
-			// Routes.applicationCommands(CLIENT_ID),
 			{ body: SpeakerCommand },
 		);
 
