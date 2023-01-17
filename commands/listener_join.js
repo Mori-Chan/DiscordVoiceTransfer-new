@@ -1,16 +1,23 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ChannelType } = require('discord.js');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const { LISTENER } = require('../config.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ljoin')
-		.setDescription('Join voice channel!'),
+		.setDescription('Join voice channel!')
+		.addChannelOption((option) =>
+			option
+				.setName('channel')
+				.setDescription('The channel to join')
+				.setRequired(true)
+				.addChannelTypes(ChannelType.GuildVoice),
+		),
 	async execute(interaction) {
+		const voiceChannel = interaction.options.getChannel('channel');
 		const connection = joinVoiceChannel({
 			group: 'listener',
 			guildId: interaction.guildId,
-			channelId: LISTENER.VC_ID,
+			channelId: voiceChannel.id,
 			adapterCreator: interaction.guild.voiceAdapterCreator,
 			selfMute: true,
 			selfDeaf: false,
