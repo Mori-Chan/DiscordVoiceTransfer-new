@@ -15,7 +15,6 @@ for (let i = 0; i < clients.length; i++) {
 	for (const file of CommandFiles[i]) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
-		// Set a new item in the Collection with the key as the command name and the value as the exported module
 		if ('data' in command && 'execute' in command) {
 			clients[i].commands.set(command.data.name, command);
 		}
@@ -43,7 +42,6 @@ for (let i = 0; i < clients.length; i++) {
 			}
 			else {
 				connections[i] = await command.execute(interaction);
-				// console.log(connections[i].joinConfig.group);
 			}
 		}
 		catch (error) {
