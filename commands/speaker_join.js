@@ -19,8 +19,8 @@ module.exports = {
 			guildId: interaction.guildId,
 			channelId: voiceChannel.id,
 			adapterCreator: interaction.guild.voiceAdapterCreator,
-			selfMute: true,
-			selfDeaf: false,
+			selfMute: false,
+			selfDeaf: true,
 		});
 		await interaction.reply('Join VC');
 		return connection;
